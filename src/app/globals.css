@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html, body {
+  padding: 0;
+  margin: 0;
+  background: #FDFCFA;
+  color: #2C3420;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* { box-sizing: border-box; }
+
+::selection {
+  background: #DAA92F;
+  color: #1E2116;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Numeric readouts (position counter, progress) sit better with tabular figures */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
