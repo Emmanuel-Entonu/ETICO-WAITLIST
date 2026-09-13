@@ -49,11 +49,13 @@ export default function Home() {
       <section className="relative bg-cream">
         <ScrollExpand
           useWindowScroll
-          panelColor="#1E2116"
+          src="/hero-main.jpg"
+          alt="An investor reviewing the markets on a laptop against a wall of greenery."
+          mediaZoom={1.2}
           startWidth={46}
           startHeight={62}
           startRadius={28}
-          overlayScrim={0}
+          overlayScrim={0.55}
           scrollDistance={0.95}
           holdDistance={0.15}
           scrollHint="Scroll to reserve your spot"
