@@ -50,8 +50,9 @@ export default function Home() {
         <ScrollExpand
           useWindowScroll
           src="/hero-main.jpg"
-          alt="An investor reviewing the markets on a laptop against a wall of greenery."
-          mediaZoom={1.2}
+          alt="A young African investor reviewing the markets on a laptop at home."
+          mediaZoom={1.08}
+          objectPosition="center 30%"
           startWidth={46}
           startHeight={62}
           startRadius={28}

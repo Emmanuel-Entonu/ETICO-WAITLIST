@@ -42,6 +42,7 @@ export interface ScrollExpandProps {
   useWindowScroll?: boolean;
   enabled?: boolean;
   panelColor?: string;
+  objectPosition?: string;
   children?: ReactNode;
   className?: string;
   style?: CSSProperties;
@@ -67,6 +68,7 @@ const ScrollExpand: React.FC<ScrollExpandProps> = ({
   useWindowScroll = false,
   enabled = true,
   panelColor = '#1E2116',
+  objectPosition = 'center',
   children,
   className = '',
   style,
@@ -239,6 +241,7 @@ const ScrollExpand: React.FC<ScrollExpandProps> = ({
       <video
         ref={mediaRef}
         className="absolute inset-0 w-full h-full object-cover origin-center select-none [will-change:transform]"
+        style={{ objectPosition }}
         src={src}
         poster={poster}
         autoPlay
@@ -250,6 +253,7 @@ const ScrollExpand: React.FC<ScrollExpandProps> = ({
       <img
         ref={mediaRef}
         className="absolute inset-0 w-full h-full object-cover origin-center select-none [will-change:transform]"
+        style={{ objectPosition }}
         src={src}
         alt={alt}
         draggable={false}
