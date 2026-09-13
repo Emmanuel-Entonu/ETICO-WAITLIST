@@ -29,9 +29,6 @@ export default function Home() {
 
   const scrollToForm = () => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
-  const nextPosition = count != null ? count + 1 : null
-  const pct = cap > 0 && count != null ? Math.min(100, Math.round((count / cap) * 100)) : 0
-
   return (
     <main className="bg-cream text-green">
       {/* ── Nav — transparent over the resting hero, cream bar once scrolling ── */}
@@ -112,33 +109,21 @@ export default function Home() {
               </p>
             </div>
 
-            {/* bottom: position stat */}
+            {/* bottom: available spots */}
             <div className="relative mt-10">
               <p className="text-[0.7rem] font-semibold tracking-[0.28em] text-cream/55">
-                {cap > 0 ? 'SPOTS ARE LIMITED' : 'YOUR POSITION'}
+                AVAILABLE SPOTS
               </p>
               <div className="mt-1.5 flex items-baseline gap-2">
-                <span className="text-cream/40 text-3xl sm:text-4xl font-display font-semibold">#</span>
                 <span className="font-display text-5xl sm:text-6xl font-extrabold tracking-tightest tnum leading-none">
-                  {nextPosition != null ? nextPosition.toLocaleString() : '···'}
+                  {cap > 0 && count != null
+                    ? Math.max(0, cap - count).toLocaleString()
+                    : count != null ? 'Open' : '···'}
                 </span>
-                {count != null && count > 0 && (
-                  <span className="ml-1 text-sm text-cream/60">
-                    joining {count.toLocaleString()} in line
-                  </span>
+                {cap > 0 && count != null && (
+                  <span className="ml-1 text-sm text-cream/60">of {cap.toLocaleString()}</span>
                 )}
               </div>
-
-              {cap > 0 && count != null && (
-                <div className="mt-5 max-w-sm">
-                  <div className="h-2 rounded-full bg-cream/15 overflow-hidden">
-                    <div className="h-full bg-gold rounded-full transition-all duration-700" style={{ width: `${Math.max(4, pct)}%` }} />
-                  </div>
-                  <p className="mt-2.5 text-xs font-medium text-cream/55 tnum">
-                    {count.toLocaleString()} of {cap.toLocaleString()} early spots claimed
-                  </p>
-                </div>
-              )}
             </div>
           </div>
 
