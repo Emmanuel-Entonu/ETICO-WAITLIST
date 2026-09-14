@@ -5,6 +5,9 @@ import { supabaseBrowser } from '@/lib/supabaseBrowser'
 
 // TODO: replace with ETICO's real social profile before launch.
 const FOLLOW_URL = 'https://instagram.com/etico'
+// The live ETICO app (niqra web). Confirmation links land here to sign in, and
+// this matches niqra's own emailRedirectTo (already allow-listed in Supabase).
+const APP_URL = 'https://www.etico.ng'
 
 function validatePassword(pw: string): string | null {
   if (pw.length < 8) return 'Password must be at least 8 characters'
@@ -13,12 +16,15 @@ function validatePassword(pw: string): string | null {
   return null
 }
 
-/* ── Step 3: create the real ETICO account (Supabase Auth, same project) ─── */
+/* ── Step 3: create the real ETICO account (Supabase Auth, same project as
+     the niqra web app + mobile app). Mirrors niqra's register form exactly:
+     full name, email, password, agree to Terms & Privacy. ─────────────────── */
 function RegisterForm({ name, email, onBack }: { name: string; email: string; onBack: () => void }) {
   const [fullName, setFullName] = useState(name)
+  const [emailInput, setEmailInput] = useState(email)
   const [password, setPassword] = useState('')
-  const [confirm, setConfirm] = useState('')
   const [show, setShow] = useState(false)
+  const [agree, setAgree] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
@@ -29,19 +35,19 @@ function RegisterForm({ name, email, onBack }: { name: string; email: string; on
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
-    if (fullName.trim().split(/\s+/).filter(Boolean).length < 2) return setError('Please enter your first and last name')
+    if (fullName.trim().split(/\s+/).filter(Boolean).length < 2) return setError('Please include your first and last name')
     const pwErr = validatePassword(password)
     if (pwErr) return setError(pwErr)
-    if (password !== confirm) return setError('Passwords do not match')
+    if (!agree) return setError('You must agree to the Terms and Privacy Policy.')
     setLoading(true)
     try {
       const supabase = supabaseBrowser()
       const { error } = await supabase.auth.signUp({
-        email: email.trim().toLowerCase(),
+        email: emailInput.trim().toLowerCase(),
         password,
         options: {
           data: { full_name: fullName.trim() },
-          emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+          emailRedirectTo: `${APP_URL}/auth/callback`,
         },
       })
       if (error) { setError(error.message); setLoading(false); return }
@@ -61,8 +67,8 @@ function RegisterForm({ name, email, onBack }: { name: string; email: string; on
         </div>
         <h3 className="font-display text-2xl font-bold text-green">Check your email</h3>
         <p className="mt-3 text-green/65 text-sm max-w-sm mx-auto leading-relaxed">
-          We sent a confirmation link to <span className="font-semibold text-green">{email}</span>. Confirm it
-          to activate your ETICO account. You&rsquo;ll sign in and complete your KYC when we go live.
+          We sent a confirmation link to <span className="font-semibold text-green">{emailInput}</span>. Open it
+          to activate your account. You&rsquo;ll sign in on the app or web and complete your KYC when we go live.
         </p>
       </div>
     )
@@ -74,37 +80,42 @@ function RegisterForm({ name, email, onBack }: { name: string; email: string; on
         <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
         Back
       </button>
-      <h3 className="font-display text-2xl font-bold text-green">Create your account</h3>
-      <p className="text-sm text-green/60 mt-1 mb-6">Set a password to secure your ETICO account.</p>
+      <h3 className="font-display text-2xl font-bold text-green">Create account</h3>
+      <p className="text-sm text-green/60 mt-1 mb-6">Start investing on the Nigerian Exchange.</p>
 
       <div className="space-y-4">
         <div>
           <p className="text-sm font-bold text-green mb-2">Full name</p>
-          <input className={inputCls} value={fullName} onChange={e => setFullName(e.target.value)} placeholder="First and last name" required />
+          <input className={inputCls} value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Full name (as on your ID)" autoComplete="name" required />
         </div>
         <div>
           <p className="text-sm font-bold text-green mb-2">Email</p>
-          <input className={`${inputCls} opacity-70`} value={email} readOnly />
+          <input className={inputCls} type="email" value={emailInput} onChange={e => setEmailInput(e.target.value)} placeholder="Email address" autoComplete="email" required />
         </div>
         <div>
           <p className="text-sm font-bold text-green mb-2">Password</p>
           <div className="relative">
-            <input className={`${inputCls} pr-16`} type={show ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="At least 8 characters" required />
+            <input className={`${inputCls} pr-16`} type={show ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Password (min. 8 characters)" autoComplete="new-password" required />
             <button type="button" onClick={() => setShow(s => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-green/50 hover:text-green">{show ? 'Hide' : 'Show'}</button>
           </div>
-          <p className="mt-1.5 text-xs text-green/45">Must include letters and numbers.</p>
-        </div>
-        <div>
-          <p className="text-sm font-bold text-green mb-2">Confirm password</p>
-          <input className={inputCls} type={show ? 'text' : 'password'} value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="Re-enter your password" required />
         </div>
       </div>
+
+      <label className="flex items-start gap-2.5 mt-5 cursor-pointer">
+        <input type="checkbox" className="mt-1 h-4 w-4 accent-gold" checked={agree} onChange={e => setAgree(e.target.checked)} />
+        <span className="text-sm text-green/70">
+          I agree to ETICO&rsquo;s{' '}
+          <a href={`${APP_URL}/terms`} target="_blank" rel="noopener noreferrer" className="underline decoration-gold text-green">Terms</a>{' '}
+          and{' '}
+          <a href={`${APP_URL}/privacy`} target="_blank" rel="noopener noreferrer" className="underline decoration-gold text-green">Privacy Policy</a>.
+        </span>
+      </label>
 
       {error && <p className="mt-4 text-sm font-semibold text-red-600">{error}</p>}
 
       <button type="submit" disabled={loading}
         className="mt-6 w-full h-14 rounded-2xl bg-green text-cream font-display font-bold text-base tracking-tight hover:bg-green-deep transition disabled:opacity-60">
-        {loading ? 'Creating your account…' : 'Create account'}
+        {loading ? 'Creating…' : 'Create account'}
       </button>
     </form>
   )
