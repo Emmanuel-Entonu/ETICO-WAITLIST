@@ -25,13 +25,13 @@ export const metadata: Metadata = {
     type: 'website',
     title: 'ETICO. Ethical investing on the NGX',
     description: 'Join the waitlist for early access at launch.',
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: 'ETICO — Join the Waitlist' }],
+    images: [{ url: '/og.jpg', width: 1200, height: 630, type: 'image/jpeg', alt: 'ETICO — Join the Waitlist' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'ETICO. Ethical investing on the NGX',
     description: 'Join the waitlist for early access at launch.',
-    images: ['/og.png'],
+    images: ['/og.jpg'],
   },
 }
 
