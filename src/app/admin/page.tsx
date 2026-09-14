@@ -73,6 +73,8 @@ export default function Admin() {
   const [fFrom, setFFrom] = useState('')
   const [fTo, setFTo] = useState('')
   const [expanded, setExpanded] = useState<string | null>(null)
+  const [capMsg, setCapMsg] = useState<{ ok: boolean; text: string } | null>(null)
+  const [savingCap, setSavingCap] = useState(false)
 
   async function load(password: string) {
     setLoading(true); setErr(null)
@@ -92,12 +94,27 @@ export default function Admin() {
   }, [])
 
   async function saveCap() {
-    const res = await fetch('/api/settings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-password': pw },
-      body: JSON.stringify({ cap: Number(capInput) }),
-    })
-    if (res.ok) load(pw)
+    const value = Number(capInput)
+    if (!Number.isFinite(value) || value < 0) { setCapMsg({ ok: false, text: 'Enter a number (0 = unlimited)' }); return }
+    setSavingCap(true); setCapMsg(null)
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-password': pw },
+        body: JSON.stringify({ cap: value }),
+      })
+      const d = await res.json().catch(() => ({}))
+      if (res.ok) {
+        setCapMsg({ ok: true, text: `Saved — cap is now ${d.cap === 0 ? 'unlimited' : d.cap.toLocaleString()}` })
+        await load(pw)
+      } else {
+        setCapMsg({ ok: false, text: d.error ?? `Save failed (${res.status})` })
+      }
+    } catch {
+      setCapMsg({ ok: false, text: 'Network error while saving' })
+    } finally {
+      setSavingCap(false)
+    }
   }
 
   const entries = data?.entries ?? []
@@ -208,8 +225,13 @@ export default function Admin() {
             <div className="flex gap-2">
               <input type="number" min={0} value={capInput} onChange={e => setCapInput(e.target.value)}
                 className="w-full rounded-lg border border-cream-sand bg-cream px-3 h-10 text-green outline-none focus:border-gold" />
-              <button onClick={saveCap} className="rounded-lg bg-gold px-4 h-10 text-sm font-extrabold text-green-ink hover:bg-gold-deep">Save</button>
+              <button onClick={saveCap} disabled={savingCap} className="rounded-lg bg-gold px-4 h-10 text-sm font-extrabold text-green-ink hover:bg-gold-deep disabled:opacity-60">
+                {savingCap ? 'Saving…' : 'Save'}
+              </button>
             </div>
+            {capMsg && (
+              <p className={`mt-2 text-xs font-semibold ${capMsg.ok ? 'text-green/70' : 'text-red-600'}`}>{capMsg.text}</p>
+            )}
           </div>
         </div>
 
