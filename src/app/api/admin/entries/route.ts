@@ -72,5 +72,8 @@ export async function GET(req: NextRequest) {
     createdAt: r.created_at,
   }))
 
-  return NextResponse.json({ total, cap: settings?.cap ?? 0, stats, entries })
+  return NextResponse.json(
+    { total, cap: settings?.cap ?? 0, stats, entries },
+    { headers: { 'Cache-Control': 'no-store, max-age=0' } },
+  )
 }

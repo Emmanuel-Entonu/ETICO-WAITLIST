@@ -79,7 +79,10 @@ export default function Admin() {
   async function load(password: string) {
     setLoading(true); setErr(null)
     try {
-      const res = await fetch('/api/admin/entries', { headers: { 'x-admin-password': password } })
+      const res = await fetch('/api/admin/entries', {
+        cache: 'no-store',
+        headers: { 'x-admin-password': password },
+      })
       if (res.status === 401) { setErr('Wrong password'); setAuthed(false); return }
       if (!res.ok) { setErr('Could not load'); return }
       const d: Data = await res.json()

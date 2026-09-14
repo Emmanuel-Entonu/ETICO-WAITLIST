@@ -8,7 +8,10 @@ export const dynamic = 'force-dynamic'
 export async function GET(req: NextRequest) {
   if (!isAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { data } = await supabaseAdmin.from('waitlist_settings').select('cap').eq('id', 1).single()
-  return NextResponse.json({ cap: data?.cap ?? 0 })
+  return NextResponse.json(
+    { cap: data?.cap ?? 0 },
+    { headers: { 'Cache-Control': 'no-store, max-age=0' } },
+  )
 }
 
 // Admin: set the cap (0 = unlimited).
@@ -21,5 +24,8 @@ export async function POST(req: NextRequest) {
 
   const { error } = await supabaseAdmin.from('waitlist_settings').upsert({ id: 1, cap })
   if (error) return NextResponse.json({ error: 'Could not update cap' }, { status: 500 })
-  return NextResponse.json({ ok: true, cap })
+  return NextResponse.json(
+    { ok: true, cap },
+    { headers: { 'Cache-Control': 'no-store, max-age=0' } },
+  )
 }
