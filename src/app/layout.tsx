@@ -15,8 +15,16 @@ const sora = Sora({
   variable: '--font-display',
 })
 
+// Absolute base for OG/Twitter image URLs. Prefer the explicit SITE_URL (your
+// custom domain); fall back to Vercel's production URL so previews never point
+// at localhost in production; localhost only in local dev.
+const siteUrl =
+  process.env.SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined) ??
+  'http://localhost:3000'
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.SITE_URL ?? 'http://localhost:3000'),
+  metadataBase: new URL(siteUrl),
   title: 'ETICO. Ethical investing on the NGX. Join the waitlist.',
   description:
     'ETICO is an ethical way to invest in stocks on the Nigerian Exchange. Join the waitlist for early access at launch.',

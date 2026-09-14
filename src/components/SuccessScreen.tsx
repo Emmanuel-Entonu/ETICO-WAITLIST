@@ -5,7 +5,7 @@ import { useState } from 'react'
 /* ── Full-width "you got a spot" screen shown after a successful signup ──── */
 export function SuccessScreen({ name, position }: { name: string; email?: string; position: number | null }) {
   const [copied, setCopied] = useState(false)
-  const link = typeof window !== 'undefined' ? window.location.origin : 'https://join.etico.ng'
+  const link = typeof window !== 'undefined' ? window.location.origin : 'https://waitlisting.etico.ng'
   const shareText = 'Join the ETICO waitlist. Ethical stock investing on the Nigerian Exchange.'
 
   const copy = async () => {
