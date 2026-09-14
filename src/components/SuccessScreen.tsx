@@ -1,12 +1,118 @@
 'use client'
 
 import { useState } from 'react'
+import { supabaseBrowser } from '@/lib/supabaseBrowser'
 
 // TODO: replace with ETICO's real social profile before launch.
 const FOLLOW_URL = 'https://instagram.com/etico'
 
+function validatePassword(pw: string): string | null {
+  if (pw.length < 8) return 'Password must be at least 8 characters'
+  if (pw.length > 72) return 'Password is too long (max 72 characters)'
+  if (!/[a-zA-Z]/.test(pw) || !/\d/.test(pw)) return 'Password must include letters and numbers'
+  return null
+}
+
+/* ── Step 3: create the real ETICO account (Supabase Auth, same project) ─── */
+function RegisterForm({ name, email, onBack }: { name: string; email: string; onBack: () => void }) {
+  const [fullName, setFullName] = useState(name)
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [show, setShow] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [done, setDone] = useState(false)
+
+  const inputCls =
+    'w-full rounded-xl border border-cream-sand bg-cream px-4 h-12 text-green placeholder:text-green/40 outline-none focus:border-gold focus:ring-2 focus:ring-gold/30 transition'
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    if (fullName.trim().split(/\s+/).filter(Boolean).length < 2) return setError('Please enter your first and last name')
+    const pwErr = validatePassword(password)
+    if (pwErr) return setError(pwErr)
+    if (password !== confirm) return setError('Passwords do not match')
+    setLoading(true)
+    try {
+      const supabase = supabaseBrowser()
+      const { error } = await supabase.auth.signUp({
+        email: email.trim().toLowerCase(),
+        password,
+        options: {
+          data: { full_name: fullName.trim() },
+          emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+        },
+      })
+      if (error) { setError(error.message); setLoading(false); return }
+      setDone(true)
+    } catch {
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (done) {
+    return (
+      <div className="rounded-3xl border border-cream-sand bg-white shadow-card p-6 sm:p-9 text-center">
+        <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-gold-soft text-gold-deep">
+          <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16v12H4z" /><path d="m4 7 8 6 8-6" /></svg>
+        </div>
+        <h3 className="font-display text-2xl font-bold text-green">Check your email</h3>
+        <p className="mt-3 text-green/65 text-sm max-w-sm mx-auto leading-relaxed">
+          We sent a confirmation link to <span className="font-semibold text-green">{email}</span>. Confirm it
+          to activate your ETICO account. You&rsquo;ll sign in and complete your KYC when we go live.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <form onSubmit={submit} className="rounded-3xl border border-cream-sand bg-white shadow-card p-6 sm:p-8">
+      <button type="button" onClick={onBack} className="text-xs font-bold text-green/50 hover:text-green mb-4 inline-flex items-center gap-1">
+        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+        Back
+      </button>
+      <h3 className="font-display text-2xl font-bold text-green">Create your account</h3>
+      <p className="text-sm text-green/60 mt-1 mb-6">Set a password to secure your ETICO account.</p>
+
+      <div className="space-y-4">
+        <div>
+          <p className="text-sm font-bold text-green mb-2">Full name</p>
+          <input className={inputCls} value={fullName} onChange={e => setFullName(e.target.value)} placeholder="First and last name" required />
+        </div>
+        <div>
+          <p className="text-sm font-bold text-green mb-2">Email</p>
+          <input className={`${inputCls} opacity-70`} value={email} readOnly />
+        </div>
+        <div>
+          <p className="text-sm font-bold text-green mb-2">Password</p>
+          <div className="relative">
+            <input className={`${inputCls} pr-16`} type={show ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="At least 8 characters" required />
+            <button type="button" onClick={() => setShow(s => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-green/50 hover:text-green">{show ? 'Hide' : 'Show'}</button>
+          </div>
+          <p className="mt-1.5 text-xs text-green/45">Must include letters and numbers.</p>
+        </div>
+        <div>
+          <p className="text-sm font-bold text-green mb-2">Confirm password</p>
+          <input className={inputCls} type={show ? 'text' : 'password'} value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="Re-enter your password" required />
+        </div>
+      </div>
+
+      {error && <p className="mt-4 text-sm font-semibold text-red-600">{error}</p>}
+
+      <button type="submit" disabled={loading}
+        className="mt-6 w-full h-14 rounded-2xl bg-green text-cream font-display font-bold text-base tracking-tight hover:bg-green-deep transition disabled:opacity-60">
+        {loading ? 'Creating your account…' : 'Create account'}
+      </button>
+    </form>
+  )
+}
+
 /* ── Full-width confirmation shown after a successful waitlist signup ────── */
-export function SuccessScreen({ name, position }: { name: string; email?: string; position: number | null }) {
+export function SuccessScreen({ name, email = '', position }: { name: string; email?: string; position: number | null }) {
+  const [mode, setMode] = useState<'confirm' | 'register'>('confirm')
   const [copied, setCopied] = useState(false)
   const link = typeof window !== 'undefined' ? window.location.origin : 'https://waitlist.etico.ng'
   const shareText = 'Join the ETICO waitlist. Ethical stock investing on the Nigerian Exchange.'
@@ -22,6 +128,14 @@ export function SuccessScreen({ name, position }: { name: string; email?: string
     } catch { /* clipboard blocked */ }
   }
 
+  if (mode === 'register') {
+    return (
+      <div className="mx-auto max-w-2xl">
+        <RegisterForm name={name} email={email} onBack={() => setMode('confirm')} />
+      </div>
+    )
+  }
+
   return (
     <div className="mx-auto max-w-2xl">
       {/* Confirmation */}
@@ -34,9 +148,8 @@ export function SuccessScreen({ name, position }: { name: string; email?: string
         </h2>
         <p className="mt-4 text-cream/75 text-sm sm:text-base max-w-md mx-auto leading-relaxed">
           You&rsquo;re now one step closer to investing with ETICO
-          {name.split(' ')[0] ? `, ${name.split(' ')[0]}` : ''}. We&rsquo;re starting with a small group of
-          early users before opening the platform more widely, and we&rsquo;ll contact you when your
-          early-access invitation is ready.
+          {name.split(' ')[0] ? `, ${name.split(' ')[0]}` : ''}. Create your account now so you&rsquo;re ready
+          to sign in and complete your KYC the moment we go live.
         </p>
 
         {position != null && (
@@ -47,6 +160,14 @@ export function SuccessScreen({ name, position }: { name: string; email?: string
             </p>
           </div>
         )}
+
+        <div className="mt-8">
+          <button type="button" onClick={() => setMode('register')}
+            className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-lg bg-gold text-green-ink font-semibold hover:bg-gold-deep transition-colors">
+            Create your account
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></svg>
+          </button>
+        </div>
       </div>
 
       {/* Move up the list */}
