@@ -109,21 +109,18 @@ export default function Home() {
               </p>
             </div>
 
-            {/* bottom: available spots */}
+            {/* bottom: slots status */}
             <div className="relative mt-10">
               <p className="text-[0.7rem] font-semibold tracking-[0.28em] text-cream/55">
-                AVAILABLE SPOTS
+                WAITLIST STATUS
               </p>
-              <div className="mt-1.5 flex items-baseline gap-2">
-                <span className="font-display text-5xl sm:text-6xl font-extrabold tracking-tightest tnum leading-none">
-                  {cap > 0 && count != null
-                    ? Math.max(0, cap - count).toLocaleString()
-                    : count != null ? 'Open' : '···'}
-                </span>
-                {cap > 0 && count != null && (
-                  <span className="ml-1 text-sm text-cream/60">of {cap.toLocaleString()}</span>
-                )}
-              </div>
+              {count == null ? (
+                <p className="mt-1.5 font-display text-4xl sm:text-5xl font-extrabold tracking-tightest leading-none text-cream/60">···</p>
+              ) : cap > 0 && count >= cap ? (
+                <p className="mt-1.5 font-display text-4xl sm:text-5xl font-extrabold tracking-tightest leading-none text-red-400">Slots closed</p>
+              ) : (
+                <p className="mt-1.5 font-display text-4xl sm:text-5xl font-extrabold tracking-tightest leading-none text-cream">Slots open</p>
+              )}
             </div>
           </div>
 
