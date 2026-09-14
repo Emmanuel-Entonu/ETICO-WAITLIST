@@ -35,19 +35,19 @@ export function SuccessScreen({ name, email, position }: { name: string; email: 
   return (
     <div className="mx-auto max-w-2xl">
       {/* Spot confirmation */}
-      <div className="rounded-[2rem] bg-green-ink text-cream shadow-panel overflow-hidden text-center px-6 sm:px-10 py-12 sm:py-16">
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gold text-green-ink">
-          <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l4 4 10-10" /></svg>
+      <div className="rounded-[1.75rem] sm:rounded-[2rem] bg-green-ink text-cream shadow-panel overflow-hidden text-center px-5 sm:px-10 py-10 sm:py-16">
+        <div className="mx-auto mb-5 sm:mb-6 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-gold text-green-ink">
+          <svg viewBox="0 0 24 24" className="h-7 w-7 sm:h-8 sm:w-8" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l4 4 10-10" /></svg>
         </div>
-        <h2 className="font-display text-3xl sm:text-4xl font-extrabold tracking-tightest">
+        <h2 className="font-display text-2xl sm:text-4xl font-extrabold tracking-tightest text-balance">
           Your spot is secured, {name.split(' ')[0] || 'friend'}.
         </h2>
         {position != null && (
           <>
-            <p className="mt-8 text-[0.72rem] font-semibold tracking-[0.3em] text-cream/55">YOUR SPOT</p>
-            <div className="mt-2 flex items-baseline justify-center gap-2">
-              <span className="text-cream/40 text-4xl sm:text-5xl font-display font-semibold">#</span>
-              <span className="font-display text-7xl sm:text-8xl font-extrabold tracking-tightest tnum leading-none">
+            <p className="mt-7 sm:mt-8 text-[0.72rem] font-semibold tracking-[0.3em] text-cream/55">YOUR SPOT</p>
+            <div className="mt-2 flex items-baseline justify-center gap-1.5 sm:gap-2">
+              <span className="text-cream/40 text-3xl sm:text-5xl font-display font-semibold">#</span>
+              <span className="font-display text-6xl sm:text-8xl font-extrabold tracking-tightest tnum leading-none break-all">
                 {position.toLocaleString()}
               </span>
             </div>
@@ -60,7 +60,7 @@ export function SuccessScreen({ name, email, position }: { name: string; email: 
       </div>
 
       {/* Invite card */}
-      <div className="mt-5 rounded-3xl border border-cream-sand bg-white shadow-card p-6 sm:p-8">
+      <div className="mt-4 sm:mt-5 rounded-3xl border border-cream-sand bg-white shadow-card p-5 sm:p-8">
         <div className="flex items-center gap-2 mb-1">
           <svg viewBox="0 0 24 24" className="h-4 w-4 text-gold-deep" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7" /><path d="M9 7h8v8" /></svg>
           <p className="font-display text-base font-bold text-green">Advance your position</p>
@@ -70,7 +70,7 @@ export function SuccessScreen({ name, email, position }: { name: string; email: 
         </p>
 
         <div className="rounded-2xl border border-cream-sand bg-cream p-4 sm:p-5">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between gap-2 flex-wrap mb-3">
             <span className="text-xs font-bold tracking-wide text-green">YOUR INVITE LINK</span>
             <span className="rounded-full bg-gold-soft text-gold-deep text-[0.65rem] font-bold tracking-wide px-2.5 py-1">MOVE UP THE QUEUE</span>
           </div>
