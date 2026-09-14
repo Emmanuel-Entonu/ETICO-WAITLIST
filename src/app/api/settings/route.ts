@@ -3,6 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { isAdmin } from '@/lib/adminAuth'
 
 export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
+export const revalidate = 0
 
 // Admin: read the current cap.
 export async function GET(req: NextRequest) {

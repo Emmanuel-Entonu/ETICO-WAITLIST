@@ -3,6 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { isAdmin } from '@/lib/adminAuth'
 
 export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
+export const revalidate = 0
 
 type Row = {
   id: string; name: string; email: string; phone: string; location: string

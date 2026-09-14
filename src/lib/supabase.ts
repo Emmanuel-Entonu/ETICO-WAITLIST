@@ -19,7 +19,17 @@ function getClient(): SupabaseClient {
     console.warn('[waitlist] SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set')
   }
   if (!cached || cachedKey !== key) {
-    cached = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } })
+    cached = createClient(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      // Force every Supabase request to bypass Next.js's persistent fetch Data
+      // Cache. Without this, Next caches the underlying fetch() responses and a
+      // route can keep serving a stale DB snapshot (e.g. an old count/cap) even
+      // after the data changes. `no-store` guarantees fresh reads on every call.
+      global: {
+        fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+          fetch(input, { ...init, cache: 'no-store' }),
+      },
+    })
     cachedKey = key
   }
   return cached

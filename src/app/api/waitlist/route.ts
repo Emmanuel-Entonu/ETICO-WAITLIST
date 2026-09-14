@@ -3,6 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { waitlistSchema } from '@/lib/schema'
 
 export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
+export const revalidate = 0
 
 async function readCap(): Promise<number> {
   const { data } = await supabaseAdmin.from('waitlist_settings').select('cap').eq('id', 1).single()
