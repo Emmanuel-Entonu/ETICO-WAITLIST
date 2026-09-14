@@ -101,7 +101,7 @@ export default function Home() {
                 ETHICAL STOCKS&nbsp;·&nbsp;NIGERIAN EXCHANGE
               </p>
               <h2 className="mt-3 font-display text-3xl sm:text-4xl font-extrabold tracking-tightest leading-[1.06]">
-                The Nigerian market, screened for your values.
+                The Nigerian market, aligned with your values.
               </h2>
               <p className="mt-4 text-cream/80 text-[0.95rem] leading-relaxed max-w-sm">
                 ETICO is a clean path into ethical stocks on the NGX. No questionable holdings, no
