@@ -56,20 +56,23 @@ export default function Home() {
           overlayScrim={0.55}
           scrollDistance={0.95}
           holdDistance={0.15}
-          scrollHint="Scroll to reserve your spot"
-          title="Invest, the ethical way."
+          scrollHint="Scroll to get early access"
+          title="Invest with purpose."
         >
           <p className="text-gold text-[0.7rem] sm:text-xs font-semibold tracking-[0.32em] mb-5">
-            ETHICAL STOCKS&nbsp;·&nbsp;NIGERIAN EXCHANGE
+            ETHICAL INVESTING&nbsp;·&nbsp;NIGERIAN EXCHANGE
           </p>
-          <h2 className="font-display text-cream text-4xl sm:text-6xl font-extrabold tracking-tightest leading-[1.04]">
-            Your place in line<br />is waiting.
+          <h2 className="font-display text-cream text-3xl sm:text-5xl font-extrabold tracking-tightest leading-[1.06]">
+            Maximize your potential.<br />Stay true to your values.
           </h2>
+          <p className="text-cream/80 mt-5 max-w-xl text-base sm:text-lg leading-relaxed">
+            A new way to invest in Nigerian stocks, screened for what matters to you.
+          </p>
           <button
             onClick={scrollToForm}
             className="mt-8 inline-flex items-center gap-2 rounded-lg bg-gold text-green-ink font-semibold px-8 h-12 hover:bg-gold-deep transition-colors"
           >
-            Reserve your position
+            Get early access
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14" /><path d="M6 13l6 6 6-6" /></svg>
           </button>
         </ScrollExpand>
@@ -98,14 +101,15 @@ export default function Home() {
             <div className="relative">
               <Image src="/etico-logo-cream.png" alt="ETICO" width={64} height={64} className="h-10 w-10 object-contain object-left opacity-90" />
               <p className="mt-8 text-gold text-[0.7rem] font-semibold tracking-[0.3em]">
-                ETHICAL STOCKS&nbsp;·&nbsp;NIGERIAN EXCHANGE
+                ETHICAL INVESTING&nbsp;·&nbsp;NIGERIAN EXCHANGE
               </p>
               <h2 className="mt-3 font-display text-3xl sm:text-4xl font-extrabold tracking-tightest leading-[1.06]">
-                The Nigerian market, aligned with your values.
+                Invest in what matters to you.
               </h2>
               <p className="mt-4 text-cream/80 text-[0.95rem] leading-relaxed max-w-sm">
-                ETICO is a clean path into ethical stocks on the NGX. No questionable holdings, no
-                hidden fees, just honest investing.
+                ETICO makes it easier to discover and invest in ethical companies on the NGX, helping you
+                pursue strong returns without compromising your values. No questionable holdings. No
+                hidden fees. Just smarter investing, aligned with your values.
               </p>
             </div>
 
@@ -135,10 +139,11 @@ export default function Home() {
                 <span className="h-px w-16 border-t border-dashed border-green/25" />
               </div>
               <h2 className="font-display text-4xl sm:text-[2.9rem] font-extrabold tracking-tightest text-green leading-[1.02]">
-                Reserve your<br />position
+                Get early<br />access
               </h2>
               <p className="mt-3.5 text-green/60 max-w-sm mx-auto">
-                A couple of quick steps and your place in line is locked in for launch day.
+                We&rsquo;re opening a limited early-access list ahead of launch. Join now to be among the
+                first to experience ETICO. No commitment, no investment required.
               </p>
             </div>
             <WaitlistForm
