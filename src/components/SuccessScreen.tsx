@@ -47,7 +47,10 @@ function RegisterForm({ name, email, onBack }: { name: string; email: string; on
         password,
         options: {
           data: { full_name: fullName.trim() },
-          emailRedirectTo: `${APP_URL}/auth/callback`,
+          // After Supabase confirms the account it redirects here — a branded
+          // "account confirmed" page on this site (not the empty app callback).
+          emailRedirectTo:
+            (typeof window !== 'undefined' ? window.location.origin : 'https://waitlist.etico.ng') + '/confirmed',
         },
       })
       if (error) { setError(error.message); setLoading(false); return }
