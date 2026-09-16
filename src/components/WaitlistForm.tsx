@@ -206,7 +206,7 @@ export function WaitlistForm({ onJoined }: { onJoined?: (info: { count: number; 
           </label>
           <label className="flex items-start gap-3 text-sm text-green cursor-pointer">
             <input type="checkbox" className="mt-0.5 h-4 w-4 accent-gold" checked={consentPolicy} onChange={e => setConsentPolicy(e.target.checked)} />
-            <span>I agree to the <a className="underline decoration-gold" href="#" onClick={e => e.preventDefault()}>Privacy Policy</a> and <a className="underline decoration-gold" href="#" onClick={e => e.preventDefault()}>Terms of Use</a>.</span>
+            <span>I agree to the <a className="underline decoration-gold" href="https://www.etico.ng/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a className="underline decoration-gold" href="https://www.etico.ng/terms" target="_blank" rel="noopener noreferrer">Terms of Use</a>.</span>
           </label>
         </div>
 
