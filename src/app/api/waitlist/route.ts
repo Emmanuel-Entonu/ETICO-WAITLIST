@@ -92,19 +92,26 @@ export async function POST(req: NextRequest) {
     // mobile use). Needs EMAIL_SEND_SECRET (and optionally PROXY_BASE) in env.
     const PROXY_BASE = process.env.PROXY_BASE ?? 'https://moneta-app-ten.vercel.app'
     const EMAIL_SEND_SECRET = process.env.EMAIL_SEND_SECRET ?? ''
-    // Awaited (not fire-and-forget) so it actually sends before this serverless
-    // function returns; best-effort, so a failure never blocks the signup.
+    // Their position = the total after their insert (they're the latest entry).
+    const count = await readCount()
+
+    // Congratulatory branded email with their waitlist number. Awaited (not
+    // fire-and-forget) so it actually sends before this serverless function
+    // returns; best-effort, so a failure never blocks the signup.
     if (EMAIL_SEND_SECRET) {
       try {
         await fetch(`${PROXY_BASE}/api/send-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'x-cron-secret': EMAIL_SEND_SECRET },
-          body: JSON.stringify({ to: v.email, type: 'waitlist', data: { name: v.name } }),
+          body: JSON.stringify({
+            to: v.email,
+            type: 'waitlist',
+            data: { name: v.name, position: count },
+          }),
         })
       } catch { /* ignore */ }
     }
 
-    const count = await readCount()
     return NextResponse.json({ ok: true, count })
   } catch {
     return NextResponse.json({ error: 'Server not configured. Set SUPABASE_SERVICE_ROLE_KEY.' }, { status: 500 })
