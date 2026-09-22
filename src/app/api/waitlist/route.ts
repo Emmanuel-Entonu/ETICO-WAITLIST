@@ -92,12 +92,16 @@ export async function POST(req: NextRequest) {
     // mobile use). Needs EMAIL_SEND_SECRET (and optionally PROXY_BASE) in env.
     const PROXY_BASE = process.env.PROXY_BASE ?? 'https://moneta-app-ten.vercel.app'
     const EMAIL_SEND_SECRET = process.env.EMAIL_SEND_SECRET ?? ''
+    // Awaited (not fire-and-forget) so it actually sends before this serverless
+    // function returns; best-effort, so a failure never blocks the signup.
     if (EMAIL_SEND_SECRET) {
-      void fetch(`${PROXY_BASE}/api/send-email`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-cron-secret': EMAIL_SEND_SECRET },
-        body: JSON.stringify({ to: v.email, type: 'waitlist', data: { name: v.name } }),
-      }).catch(() => {})
+      try {
+        await fetch(`${PROXY_BASE}/api/send-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-cron-secret': EMAIL_SEND_SECRET },
+          body: JSON.stringify({ to: v.email, type: 'waitlist', data: { name: v.name } }),
+        })
+      } catch { /* ignore */ }
     }
 
     const count = await readCount()
