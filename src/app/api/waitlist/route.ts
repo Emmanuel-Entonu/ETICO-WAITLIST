@@ -87,6 +87,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Could not save your spot. Please try again.' }, { status: 500 })
     }
 
+    // Branded "you're on the waitlist" email — best-effort, never blocks the
+    // response. Goes through the shared ETICO email proxy (same one the app +
+    // mobile use). Needs EMAIL_SEND_SECRET (and optionally PROXY_BASE) in env.
+    const PROXY_BASE = process.env.PROXY_BASE ?? 'https://moneta-app-ten.vercel.app'
+    const EMAIL_SEND_SECRET = process.env.EMAIL_SEND_SECRET ?? ''
+    if (EMAIL_SEND_SECRET) {
+      void fetch(`${PROXY_BASE}/api/send-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-cron-secret': EMAIL_SEND_SECRET },
+        body: JSON.stringify({ to: v.email, type: 'waitlist', data: { name: v.name } }),
+      }).catch(() => {})
+    }
+
     const count = await readCount()
     return NextResponse.json({ ok: true, count })
   } catch {
