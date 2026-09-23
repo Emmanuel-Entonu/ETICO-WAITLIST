@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
+import { sendBrandedEmail } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
@@ -56,20 +57,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Could not create your account. Please try again.' }, { status: 500 })
     }
 
-    // Branded welcome email through the shared proxy. Best-effort, awaited (Next
-    // 14 has no after()), never blocks the success response.
-    const PROXY_BASE = process.env.PROXY_BASE ?? 'https://moneta-app-ten.vercel.app'
-    const EMAIL_SEND_SECRET = process.env.EMAIL_SEND_SECRET ?? ''
-    if (EMAIL_SEND_SECRET) {
-      try {
-        await fetch(`${PROXY_BASE}/api/send-email`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-cron-secret': EMAIL_SEND_SECRET },
-          body: JSON.stringify({ to: email, type: 'welcome', data: { name: fullName } }),
-          cache: 'no-store',
-        })
-      } catch { /* ignore — signup still succeeded */ }
-    }
+    // Branded welcome email through the shared proxy — same as niqra's
+    // signUpAction. Awaited best-effort (Next 14 has no after()); a failure is
+    // logged, never blocks the successful signup.
+    await sendBrandedEmail(email, 'welcome', { name: fullName })
 
     return NextResponse.json({ ok: true })
   } catch {

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { waitlistSchema } from '@/lib/schema'
+import { sendBrandedEmail } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
@@ -87,30 +88,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Could not save your spot. Please try again.' }, { status: 500 })
     }
 
-    // Branded "you're on the waitlist" email — best-effort, never blocks the
-    // response. Goes through the shared ETICO email proxy (same one the app +
-    // mobile use). Needs EMAIL_SEND_SECRET (and optionally PROXY_BASE) in env.
-    const PROXY_BASE = process.env.PROXY_BASE ?? 'https://moneta-app-ten.vercel.app'
-    const EMAIL_SEND_SECRET = process.env.EMAIL_SEND_SECRET ?? ''
     // Their position = the total after their insert (they're the latest entry).
     const count = await readCount()
 
-    // Congratulatory branded email with their waitlist number. Awaited (not
-    // fire-and-forget) so it actually sends before this serverless function
-    // returns; best-effort, so a failure never blocks the signup.
-    if (EMAIL_SEND_SECRET) {
-      try {
-        await fetch(`${PROXY_BASE}/api/send-email`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-cron-secret': EMAIL_SEND_SECRET },
-          body: JSON.stringify({
-            to: v.email,
-            type: 'waitlist',
-            data: { name: v.name, position: count },
-          }),
-        })
-      } catch { /* ignore */ }
-    }
+    // Branded "you're on the waitlist" email with their number — awaited (Next
+    // 14 has no after()) so it sends before the function returns; best-effort,
+    // so a failure never blocks the signup and is logged, not swallowed.
+    await sendBrandedEmail(v.email, 'waitlist', { name: v.name, position: count })
 
     return NextResponse.json({ ok: true, count })
   } catch {
