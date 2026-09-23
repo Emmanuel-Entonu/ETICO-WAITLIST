@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { supabaseBrowser } from '@/lib/supabaseBrowser'
 
 // TODO: replace with ETICO's real social profile before launch.
 const FOLLOW_URL = 'https://instagram.com/etico'
@@ -41,19 +40,13 @@ function RegisterForm({ name, email, onBack }: { name: string; email: string; on
     if (!agree) return setError('You must agree to the Terms and Privacy Policy.')
     setLoading(true)
     try {
-      const supabase = supabaseBrowser()
-      const { error } = await supabase.auth.signUp({
-        email: emailInput.trim().toLowerCase(),
-        password,
-        options: {
-          data: { full_name: fullName.trim() },
-          // After Supabase confirms the account it redirects here — a branded
-          // "account confirmed" page on this site (not the empty app callback).
-          emailRedirectTo:
-            (typeof window !== 'undefined' ? window.location.origin : 'https://waitlist.etico.ng') + '/confirmed',
-        },
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName: fullName.trim(), email: emailInput.trim().toLowerCase(), password }),
       })
-      if (error) { setError(error.message); setLoading(false); return }
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) { setError(data.error ?? 'Could not create your account.'); setLoading(false); return }
       setDone(true)
     } catch {
       setError('Something went wrong. Please try again.')
@@ -65,14 +58,19 @@ function RegisterForm({ name, email, onBack }: { name: string; email: string; on
   if (done) {
     return (
       <div className="rounded-3xl border border-cream-sand bg-white shadow-card p-6 sm:p-9 text-center">
-        <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-gold-soft text-gold-deep">
-          <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16v12H4z" /><path d="m4 7 8 6 8-6" /></svg>
+        <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-gold text-green-ink">
+          <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l4 4 10-10" /></svg>
         </div>
-        <h3 className="font-display text-2xl font-bold text-green">Check your email</h3>
+        <h3 className="font-display text-2xl font-bold text-green">Account created. 🎉</h3>
         <p className="mt-3 text-green/65 text-sm max-w-sm mx-auto leading-relaxed">
-          We sent a confirmation link to <span className="font-semibold text-green">{emailInput}</span>. Open it
-          to activate your account. You&rsquo;ll sign in on the app or web and complete your KYC when we go live.
+          Your ETICO account is ready and we&rsquo;ve sent a welcome email to{' '}
+          <span className="font-semibold text-green">{emailInput}</span>. Sign in on the app or web to complete
+          your KYC the moment we go live.
         </p>
+        <a href={`${APP_URL}/login`} target="_blank" rel="noopener noreferrer"
+          className="mt-6 inline-flex items-center justify-center h-12 px-8 rounded-lg bg-green text-cream font-display font-bold text-sm tracking-tight hover:bg-green-deep transition-colors">
+          Sign in
+        </a>
       </div>
     )
   }

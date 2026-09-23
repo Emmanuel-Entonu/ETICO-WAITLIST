@@ -18,6 +18,9 @@ ETICO Supabase project** (server-side, service-role only — no DB keys ship to 
    - `SUPABASE_URL` — already set to the existing project.
    - `SUPABASE_SERVICE_ROLE_KEY` — Supabase → Project Settings → API → **service_role**. Paste it.
    - `ADMIN_PASSWORD` — set the password that unlocks `/admin`.
+   - `EMAIL_SEND_SECRET` — server-to-server key for the shared branded email
+     endpoint (same value as the proxy's + the web app's). Needed for the
+     confirmation email below. Optional: `PROXY_BASE` to override the proxy URL.
 
 3. **Install & run**
    ```bash
@@ -31,6 +34,26 @@ ETICO Supabase project** (server-side, service-role only — no DB keys ship to 
 Name, Email, Phone, Location (state), investing experience, interests (multi),
 motivations (up to 3), how-they-heard, an “Other” note, and both consent flags —
 plus `created_at` and a `notified_at` slot for sending launch emails later.
+
+## Email (shared branded system)
+On a successful signup, `src/app/api/waitlist/route.ts` sends a **branded
+confirmation email** that includes the person's **waitlist position** — via the
+one shared email service all ETICO apps use (web, mobile, waitlist), so nothing
+ships Moneta's default template:
+
+- `POST ${PROXY_BASE}/api/send-email` with `{ to, type: "waitlist", data: { name, position } }`
+  and header `x-cron-secret: <EMAIL_SEND_SECRET>`. Branding lives in the proxy
+  (`moneta-app/api/send-email.ts` → `renderTemplate`), not here.
+- The send is `await`ed (this app is Next **14**, which has no `after()`), so it
+  finishes before the serverless function returns.
+- Needs `EMAIL_SEND_SECRET` set in this project's env (see Setup). The
+  `MONETA_EMAIL_*` merchant on the proxy must be funded or sends return
+  "low balance".
+
+> The same proxy also exposes `POST /api/send-email-attachment` (PDF attachments,
+> e.g. the web app's KYC-to-PAC send). The waitlist doesn't use it, but it's the
+> same auth/branding if you ever need to attach a file. Keep any attachment well
+> under Vercel's ~4.5 MB request-body limit.
 
 ## The cap
 Set a maximum number of signups in the CMS (0 = unlimited). When the cap is reached,
