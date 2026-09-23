@@ -31,3 +31,10 @@ html {
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum' 1;
 }
+
+/* Hide the browser's native password reveal/clear controls — we render our own
+   eye toggle, and Edge/IE would otherwise show a second, redundant one. */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}

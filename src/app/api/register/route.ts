@@ -18,10 +18,13 @@ function validName(v: string): boolean {
 function validEmail(v: string): boolean {
   return /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(v)
 }
+// Same policy as niqra-web / the mobile app: 8+ chars with an uppercase,
+// lowercase, number and special character.
 function passwordError(pw: string): string | null {
-  if (pw.length < 8) return 'Password must be at least 8 characters'
   if (pw.length > 72) return 'Password is too long (max 72 characters)'
-  if (!/[a-zA-Z]/.test(pw) || !/\d/.test(pw)) return 'Password must include letters and numbers'
+  if (pw.length < 8 || !/[a-z]/.test(pw) || !/[A-Z]/.test(pw) || !/\d/.test(pw) || !/[^A-Za-z0-9]/.test(pw)) {
+    return 'Password must be 8+ characters with an uppercase, lowercase, number and special character'
+  }
   return null
 }
 
